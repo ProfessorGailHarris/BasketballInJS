@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+  <title>Basketball</title>
+
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    
+    #canvas {
+      width: 600px;
+      height: 300px;
+      border: 1px solid red;
+    }
+    #winnerTag
+    {
+      color: red;
+    }
+  </style>
+
+</head>
+<body>
+  <h1>Basketball</h1>
+  <h3>Score: <span id="score">0</span> 
+    Timer: <span id="timer">0.00</span></h3>
+  <h2 id="winnerTag">You Win</h2>
+
+  <canvas id="canvas" width="600" height="300"></canvas>
+  <p>
+    <button id="left_button">Left</button>
+    <button id="shoot_button">Shoot!</button>
+    <button id="right_button">Right</button>
+  </p>
+  <script src="basketball.js"></script>
+
+</body>
+</html>
