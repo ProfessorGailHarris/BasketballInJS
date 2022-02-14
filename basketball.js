@@ -6,12 +6,10 @@
 
 
 //TODO: 
-//  DONE: add timer to see how quickly can win the game
-//  DONE: use timestamp in frame call, need this for delta time
-//  use equations of motion for gravity (current has fixed dy)
+//  use equations of motion for gravity and other forces
+//    (see TODO's embedded below)
 //  experiment with shooting NOT stopping x axis motion
 //  experiment with using AD for x axis motion, and up-arrow for throw
-//  see TODO's embedded below
 
 // Initialize the canvas
 let canvas = document.getElementById("canvas");
@@ -32,13 +30,13 @@ let timer = document.getElementById("timer");
 
 // Create a template for a circle
 // One instance will be the ball, other will be the hoop
-function Circle(color_, fill_, x_, y_, dx_, dy_, radius_, fixed_) {
+function Circle(color_, fill_, x_, y_, dx_, dy_, radius_, isBall_) {
   this.x = x_;
   this.y = y_;
   this.dx = dx_;
   this.dy = dy_;
   this.radius = radius_;
-  this.fixed = fixed_; // boolean, if false then subject to gravity
+  this.isBall = isBall_; // boolean, if true then subject to gravity
 
   // member function to draw the circle
   this.draw = function (context) {
@@ -66,7 +64,7 @@ function Circle(color_, fill_, x_, y_, dx_, dy_, radius_, fixed_) {
         this.dx *= -1;
     }
     // [TODO] fix this fake gravity
-    if (!this.fixed) this.dy += 0.2;
+    if (this.isBall) this.dy += 0.2;
 
     // if the object hits the ground, then stop moving in y direction 
     // no bouncing in y axis
@@ -113,7 +111,7 @@ let basketball = new Circle(
     0,
     0,
     radius,
-    false
+    true
 );
 
 let hoop = new Circle(
@@ -124,7 +122,7 @@ let hoop = new Circle(
     1,  //horizontal motion
     0,  //vertical motion
     radius * 1.5,
-    true
+    false
 );
 
 
@@ -138,7 +136,7 @@ function shoot(event) {
     // Could use physics equations, 
     // for this workshop we'll just experiment
     //
-    // TODO: make this a force (stop faking gravity)
+    // [TODO] make this a force
     basketball.dy = -9;
   }
 }
@@ -167,7 +165,7 @@ function gameover() {
 }
 
 
-function physics_motion( nowTime, lastTime ) {
+function gameLoop( nowTime, lastTime ) {
   var deltaTime = (nowTime - lastTime) / 1000;
   timer.innerHTML = (lastTime/1000).toFixed(0);
 
@@ -200,7 +198,7 @@ function physics_motion( nowTime, lastTime ) {
   {
     requestAnimationFrame(
         function(timestamp){ 
-          physics_motion( timestamp, nowTime );
+          gameLoop( timestamp, nowTime );
         }
     );
   }
@@ -209,6 +207,6 @@ function physics_motion( nowTime, lastTime ) {
 // Initialize the frame animation
 let id = requestAnimationFrame(
     function(timestamp){ 
-      physics_motion( 0, 0 );
+      gameLoop( 0, 0 );
     }
 );
