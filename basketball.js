@@ -4,13 +4,6 @@
 // a Humber student in 2022
 // who submitted a basketball game for a third year course assignment
 
-
-//TODO: 
-//  use equations of motion for gravity and other forces
-//    (see TODO's embedded below)
-//  experiment with shooting NOT stopping x axis motion
-//  experiment with using AD for x axis motion, and up-arrow for throw
-
 // Initialize the canvas
 let canvas = document.getElementById("canvas");
 let context;
@@ -25,20 +18,21 @@ let winningScore = 4;
 // Set up variables to represent information on the web page
 let winnerElement = document.getElementById("winnerTag");
 winnerElement.style.visibility = "hidden";
+//winnerElement.style.visibility = "visible";
 let scoreElement = document.getElementById("score");
 let timer = document.getElementById("timer");
 
 // Create a template for a circle
 // One instance will be the ball, other will be the hoop
-function Circle(color_, fill_, x_, y_, dx_, dy_, radius_, isBall_) {
-  this.x = x_;
-  this.y = y_;
-  this.dx = dx_;
-  this.dy = dy_;
+function Circle(color_, fill_, x_, y_, dx_, dy_, radius_) {
+  this.x = x_;  // position along x axis
+  this.y = y_;  // position along y axis
+  this.dx = dx_;  // amount to change x on each redraw of the canvas
+  this.dy = dy_;  // amount to change y on each redraw of the canvas
   this.radius = radius_;
-  this.isBall = isBall_; // boolean, if true then subject to gravity
 
   // member function to draw the circle
+  // https://www.w3schools.com/html/html5_canvas.asp
   this.draw = function (context) {
     context.beginPath();
     context.lineWidth = 5;
@@ -51,53 +45,15 @@ function Circle(color_, fill_, x_, y_, dx_, dy_, radius_, isBall_) {
 
   // member function to make the circle move
   this.update = function (deltaTime_) {
-    this.x += this.dx;
-    this.y += this.dy;
+    // we have some work to do here
 
-    // bounce at left and right sides
-    if (this.x < this.radius) 
-    {
-        this.dx *= -1;
-    }
-    else if (this.x > (canvas.width - this.radius)) 
-    {
-        this.dx *= -1;
-    }
-    // [TODO] fix this fake gravity
-    if (this.isBall) this.dy += 0.2;
-
-    // if the object hits the ground, then stop moving in y direction 
-    // no bouncing in y axis
-    if (this.y >= canvas.height - this.radius  ) 
-    {
-      this.y = canvas.height - this.radius;
-      this.dy = 0;
-    }
   };
   
   // member function to detect ball going through the hoop
   this.collide = function (other_) {
-    let otherleft = other_.x - other_.radius + this.radius;
-    let otherright = other_.x + other_.radius - this.radius;
-
-    // did ball go "above" the hoop, and
-    // did ball fall between left and right boundaries of hoop
-    if ( this.y <= other_.y && 
-         this.x >= otherleft && this.x <= otherright ) 
-    {
-      // should we do anything about horizontal movement?
-//      this.x = other_.x;
-//      this.dx = other_.dx;
-      
-      // prevent multiple collisions by jumping this (the basketball)
-      // to below the hoop
-      // (also has interesting visual effect)
-      this.y = other_.y + this.radius * 0.5;
-      return true;
-    }
-    else {
-      return false;
-    }
+    // we have some work to do here
+    
+    return false;
   };
 }
 
@@ -127,24 +83,15 @@ let hoop = new Circle(
 
 
 function shoot(event) {
-  if (basketball.dy == 0) 
-  {
-    basketball.dx = 0;
-    // Set dy so that max height reached is where hoop is
-    // Hoop is at canvas height - 80
-    // Need to change this if we change the canvas height
-    // Could use physics equations, 
-    // for this workshop we'll just experiment
-    //
-    // [TODO] make this a force
-    basketball.dy = -9;
-  }
+  // we have some work to do here
 }
+
 function left(event) {
-  basketball.dx = -2.5;
+  // we have some work to do here
 }
+
 function right(event) {
-  basketball.dx = 2.5;
+  // we have some work to do here
 }
 
 
@@ -159,9 +106,8 @@ my_right_button.addEventListener("click", right);
 
 function gameover() {
   winnerElement.style.visibility = "visible";
-  my_shoot_button.style.visibility = "hidden";
-  my_left_button.style.visibility = "hidden";
-  my_right_button.style.visibility = "hidden";
+  // we have some work to do here
+  //   to hide the buttons that move the ball
 }
 
 
@@ -172,25 +118,32 @@ function gameLoop( nowTime, lastTime ) {
   // Clear canvas
   context.clearRect( 0, 0, canvas.width, canvas.height );
   
+  // Draw each game component
   hoop.draw(context);
-  hoop.update(deltaTime);
   basketball.draw(context);
+  
+  // Update the position of each game component
+  hoop.update(deltaTime);
   basketball.update(deltaTime);
 
+  // Check if the player scored
   if ( basketball.collide(hoop) )
   {
     score++;
+    // Update the score value in the HTML element
+    // (remember, that element is outside the canvas)
     scoreElement.innerHTML = score;
+
     if (score >= winningScore) 
     {
+      // call gameover, which should hide the buttons from the player
       gameover();
     }
   }
 
-  // let basketball fall to ground, then stop animating
-  if ( score >= winningScore 
-      && (basketball.y >= canvas.height - basketball.radius) )
+  if ( score >= winningScore )
   {
+    // then stop animating
     timer.innerHTML = (lastTime/1000).toFixed(2);
     cancelAnimationFrame(id);
   }
