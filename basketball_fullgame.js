@@ -6,8 +6,6 @@
 
 
 //TODO: 
-//  use equations of motion for gravity and other forces
-//    (see TODO's embedded below)
 //  experiment with shooting NOT stopping x axis motion
 //  experiment with using AD for x axis motion, and up-arrow for throw
 
@@ -21,6 +19,8 @@ if (canvas.getContext('2d')) {
 // Initialize some important game variables
 let score = 0;
 let winningScore = 4;
+// Set gravity constant
+const GRAVITY = 800;
 
 // Set up variables to represent information on the web page
 let winnerElement = document.getElementById("winnerTag");
@@ -30,11 +30,11 @@ let timer = document.getElementById("timer");
 
 // Create a template for a circle
 // One instance will be the ball, other will be the hoop
-function Circle(color_, fill_, x_, y_, dx_, dy_, radius_, isBall_) {
+function Circle(color_, fill_, x_, y_, velX_, velY_, radius_, isBall_) {
   this.x = x_;
   this.y = y_;
-  this.dx = dx_;
-  this.dy = dy_;
+  this.velX = velX_;
+  this.velY = velY_;
   this.radius = radius_;
   this.isBall = isBall_; // boolean, if true then subject to gravity
 
@@ -51,27 +51,22 @@ function Circle(color_, fill_, x_, y_, dx_, dy_, radius_, isBall_) {
 
   // member function to make the circle move
   this.update = function (deltaTime_) {
-    this.x += this.dx;
-    this.y += this.dy;
+    this.x += this.velX * deltaTime_;
+    this.y += this.velY * deltaTime_;
 
     // bounce at left and right sides
-    if (this.x < this.radius) 
+    if ( (this.x < this.radius) || (this.x > (canvas.width - this.radius)) )
     {
-        this.dx *= -1;
+        this.velX *= -1;
     }
-    else if (this.x > (canvas.width - this.radius)) 
-    {
-        this.dx *= -1;
-    }
-    // [TODO] fix this fake gravity
-    if (this.isBall) this.dy += 0.2;
+    if (this.isBall) this.velY += GRAVITY * deltaTime_;
 
     // if the object hits the ground, then stop moving in y direction 
     // no bouncing in y axis
     if (this.y >= canvas.height - this.radius  ) 
     {
       this.y = canvas.height - this.radius;
-      this.dy = 0;
+      this.velY = 0;
     }
   };
   
@@ -92,7 +87,7 @@ function Circle(color_, fill_, x_, y_, dx_, dy_, radius_, isBall_) {
       // prevent multiple collisions by jumping this (the basketball)
       // to below the hoop
       // (also has interesting visual effect)
-      this.y = other_.y + this.radius * 0.5;
+      this.y = other_.y + this.radius * 0.6;
       return true;
     }
     else {
@@ -119,7 +114,7 @@ let hoop = new Circle(
     "white",
     canvas.width/2,
     80,
-    1,  //horizontal motion
+    100,  //horizontal motion
     0,  //vertical motion
     radius * 1.5,
     false
@@ -127,24 +122,25 @@ let hoop = new Circle(
 
 
 function shoot(event) {
-  if (basketball.dy == 0) 
+  // Only shoot if ball is not already moving on y-axis
+  if (basketball.velY == 0) 
   {
-    basketball.dx = 0;
-    // Set dy so that max height reached is where hoop is
+    basketball.velX = 0;
+
+    // Set y-axis velocity so that max height reached is where hoop is
     // Hoop is at canvas height - 80
     // Need to change this if we change the canvas height
-    // Could use physics equations, 
-    // for this workshop we'll just experiment
-    //
-    // [TODO] make this a force
-    basketball.dy = -9;
+    // Could use physics equations to calculate, 
+    // but for this workshop we'll just experiment
+
+    basketball.velY = -580;
   }
 }
 function left(event) {
-  basketball.dx = -2.5;
+  basketball.velX = -195;
 }
 function right(event) {
-  basketball.dx = 2.5;
+  basketball.velX = 195;
 }
 
 
