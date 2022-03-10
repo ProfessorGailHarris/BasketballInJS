@@ -31,10 +31,10 @@ let timer = document.getElementById("timer");
 // Create a template for a circle
 // One instance will be the ball, other will be the hoop
 function Circle(color_, fill_, x_, y_, dx_, dy_, radius_, isBall_) {
-  this.x = x_;
-  this.y = y_;
-  this.dx = dx_;
-  this.dy = dy_;
+  this.x = x_;  // position along x axis
+  this.y = y_;  // position along y axis
+  this.dx = dx_;  // amount to change x on each redraw of the canvas
+  this.dy = dy_;  // amount to change y on each redraw of the canvas
   this.radius = radius_;
   this.isBall = isBall_; // boolean, if true then subject to gravity
 
